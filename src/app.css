@@ -1,0 +1,38 @@
+:root {
+  /* Surfaces */
+  --bg-topbar-top: #8f6963;
+  --bg-topbar-bottom: #814f46;
+  --topbar-border: #6d3f37;
+  --bg-canvas: #e3cebb;
+  --bg-field: #f5ede4;
+
+  /* Text */
+  --text-on-dark: #faf6ee;
+  --text-primary: #2C221E;
+  --text-muted: #7d6e64;
+
+  /* Accents */
+  --accent: #814f46;
+  --btn-bg-top: #FAF7F2;
+  --btn-bg-bottom: #ded0be;
+  --btn-border: #c9b49f;
+
+  /* Typography System */
+  --font-slab: 'Pridi', serif;                       /* The Brand Crest */
+  --font-interface: 'IBM Plex Sans', sans-serif;     /* The Machine / Chrome */
+  --font-memory: Georgia, 'Times New Roman', serif;  /* The Human Thought */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-interface);
+  -webkit-font-smoothing: antialiased;
+}
