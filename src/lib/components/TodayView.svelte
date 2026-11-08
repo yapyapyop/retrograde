@@ -7,7 +7,10 @@
     loadEntry, 
     saveEntry,
     deleteEntry,
+    getEntryCount
   } from '$lib/storage';
+
+  import Icon from '$lib/components/Icon.svelte';
 
   let currentDate = $state<Date>(new Date());
   let currentDateKey = $derived(toDateKey(currentDate));
@@ -22,6 +25,12 @@
   export function reload() {
     loadForCurrentDate();
   }
+
+  let { onNavigateToChronicle } = $props<{
+    onNavigateToChronicle?: () => void;
+  }>();
+
+  let entryCount = $derived(getEntryCount());
 
   function loadForCurrentDate() {
     const existing = loadEntry(currentDateKey);
@@ -114,6 +123,18 @@
       ratingStr = next.toFixed(1);
     }
   }
+
+  function autoResize(node: HTMLTextAreaElement) {
+    const resize = () => {
+      node.style.height = 'auto';
+      node.style.height = Math.min(node.scrollHeight, 170) + 'px';
+    };
+    node.addEventListener('input', resize);
+    setTimeout(resize, 0);
+    return {
+      destroy: () => node.removeEventListener('input', resize)
+    };
+  }
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -157,9 +178,10 @@
     <label for="why" class="why-label">Why?</label>
     <textarea
       id="why"
+      use:autoResize
       bind:value={note}
       placeholder="A few words, if you feel like it…"
-      rows="4"
+      rows="2"
     ></textarea>
   </div>
 
@@ -197,15 +219,28 @@
       disabled={!isValidRating}
       onclick={handleSave}
     >
-      {saveStatus === 'saved' ? 'Saved' : 'Save'}
+      <Icon name="rate" size={15} />
+      <span>{saveStatus === 'saved' ? 'Recorded' : 'Rate'}</span>
     </button>
   </div>
+
+  <footer class="today-footer">
+    <span class="entry-count">{entryCount} {entryCount === 1 ? 'day' : 'days'} recorded</span>
+    <span class="bullet">·</span>
+    <button 
+      type="button" 
+      class="chronicle-link" 
+      onclick={onNavigateToChronicle}
+    >
+      See your Chronicle →
+    </button>
+  </footer>
 </div>
 
 <style>
   .entry-card {
     width: 100%;
-    max-width: 440px;
+    max-width: 520px;
     display: flex;
     flex-direction: column;
   }
@@ -286,13 +321,11 @@
   .score-instrument {
     display: inline-flex;
     align-items: baseline;
-    background: #fbf7ef;
-    border: 1px solid #bfac99;
-    border-radius: 3px;
+    background: var(--bg-field);
+    border: 1px solid #b89a82;
+    border-radius: 4px;
     padding: 0.3rem 1.1rem;
-    box-shadow: 
-      0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
   }
 
   .score-input {
@@ -357,9 +390,7 @@
     line-height: 1.6;
     resize: none;
     outline: none;
-    box-shadow: 
-      inset 0 1px 3px rgba(0, 0, 0, 0.05),
-      0 1px 0 rgba(255, 255, 255, 0.8);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
   textarea::placeholder {
@@ -429,46 +460,94 @@
     color: #9e3d30; /* Muted brick red warning */
   }
 
-  /* Stepped mechanical keycap with 2px physical lip */
   .mechanical-key {
-    padding: 0.5rem 2.25rem;
+    /* Perfect flex centering */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    line-height: 1;
+
+    /* Your custom sizing */
+    padding: 0.55rem 2.25rem;
     font-family: var(--font-interface);
-    font-size: 0.88rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    color: var(--text-primary);
-    background: linear-gradient(to bottom, #fcf9f4, #dcd0bf);
-    border: 1px solid #b39f8a;
-    border-bottom: 1px solid #9e8a76;
-    border-radius: 3px;
+    color: #ffffff;
+    
+    /* Richer, deeper brick red */
+    background: #7e352b;
+    border: 1px solid #5c2017;
+    border-radius: 4px;
     cursor: pointer;
-    box-shadow: 
-      0 2px 0 #b39f8a,           /* Physical bottom keycap shelf */
-      0 3px 2px rgba(0, 0, 0, 0.08);
-    transition: none;            /* Pure mechanical instantaneous click */
+    box-shadow: none;
+    text-shadow: none;
+    transition: none;
   }
 
   .mechanical-key:hover:not(:disabled) {
-    background: linear-gradient(to bottom, #ffffff, #e5d9c9);
+    background: #913f33;
+    border-color: #6d271d;
   }
 
-  /* The Mechanical Click Down */
   .mechanical-key:active:not(:disabled) {
-    transform: translateY(2px);  /* Depresses the keycap completely */
-    box-shadow: 
-      0 0 0 #b39f8a,
-      inset 0 1px 2px rgba(0, 0, 0, 0.15);
+    background: #5c2017;
+    border-color: #42140d;
+    transform: none;
   }
 
   .mechanical-key.saved {
-    background: var(--bg-topbar-bottom);
-    color: #fff;
-    border-color: var(--topbar-border);
-    box-shadow: 0 2px 0 #4a2823;
+    background: #4a2823;
+    border-color: #381c18;
+    color: #dfd0be;
   }
 
   .mechanical-key:disabled {
-    opacity: 0.4;
+    background: #d4c3b2;
+    border-color: #bfac99;
+    color: #9d8b7a;
     cursor: not-allowed;
-    box-shadow: 0 1px 0 #b39f8a;
+  }
+
+  .today-footer {
+    margin-top: 4.5rem;          /* Generous breathing room below the Rate key */
+    padding-bottom: 1.5rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.6rem;
+    font-family: var(--font-interface);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    user-select: none;
+  }
+
+  .entry-count {
+    opacity: 0.7;
+  }
+
+  .bullet {
+    opacity: 0.4;
+  }
+
+  /* Quiet Text Action */
+  .chronicle-link {
+    background: none;
+    border: none;
+    font-family: var(--font-interface);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.85;
+    transition: none;
+  }
+
+  .chronicle-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    opacity: 1;
   }
 </style>

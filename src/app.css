@@ -1,26 +1,37 @@
 :root {
-  /* Surfaces */
-  --bg-topbar-top: #8f6963;
-  --bg-topbar-bottom: #814f46;
-  --topbar-border: #6d3f37;
-  --bg-canvas: #e3cebb;
-  --bg-field: #f5ede4;
+  /* -------------------------------------------------- */
+  /* Surfaces (Enriched Bento Scheme)                   */
+  /* -------------------------------------------------- */
+  
+  /* Topbar: Richer, deeper cordovan / brick (No more dusty mauve) */
+  --bg-topbar-top: #996056;
+  --bg-topbar-bottom: #864a3c;
+  --topbar-border: #4d1811;
+
+  /* Canvas: Richer oatmeal parchment (Less washed-out milky tan) */
+  --bg-canvas: #d6baa2;
+  --bg-canvas-top: #dac6ad;
+  --bg-canvas-bottom: #cab096;
+
+  /* Inputs: Crisp ivory paper (Now clearly pops off the canvas) */
+  --bg-field: #faf6ee;
 
   /* Text */
   --text-on-dark: #faf6ee;
-  --text-primary: #2C221E;
-  --text-muted: #7d6e64;
+  --text-primary: #2c1f1a;      /* Deeper espresso */
+  --text-muted: #786456;        /* Warm archival brown */
 
-  /* Accents */
-  --accent: #814f46;
-  --btn-bg-top: #FAF7F2;
-  --btn-bg-bottom: #ded0be;
-  --btn-border: #c9b49f;
+  /* Accents & Buttons */
+  --accent: #864a3c;            /* Matches the rich brick tone */
+  --btn-bg-top: #faf6ee;
+  --btn-bg-bottom: #cfb199;
+  --btn-border: #b89a82;
 
   /* Typography System */
-  --font-slab: 'Pridi', serif;                       /* The Brand Crest */
-  --font-interface: 'IBM Plex Sans', sans-serif;     /* The Machine / Chrome */
-  --font-memory: Georgia, 'Times New Roman', serif;  /* The Human Thought */
+  --font-brand: Georgia, 'Times New Roman', serif;   /* The Logo Crest */
+  --font-title: 'Pridi', serif;                      /* Chronicle & Numbers Headings */
+  --font-interface: 'IBM Plex Sans', sans-serif;     /* Controls & Navigation */
+  --font-memory: Georgia, 'Times New Roman', serif;  /* The Written Thoughts */
 }
 
 * {
@@ -31,7 +42,8 @@
 
 html, body {
   height: 100%;
-  background-color: var(--bg-canvas);
+  background: linear-gradient(to bottom, var(--bg-canvas-top), var(--bg-canvas-bottom));
+  background-attachment: fixed; /* Keeps lighting consistent on long pages like Numbers */
   color: var(--text-primary);
   font-family: var(--font-interface);
   -webkit-font-smoothing: antialiased;

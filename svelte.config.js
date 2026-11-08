@@ -6,11 +6,10 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			fallback: '404.html' // Pure SPA fallback
+			fallback: '404.html'
 		}),
 		paths: {
-			// On GitHub Pages, your site will be hosted at /retrograde/
-			base: process.argv.includes('dev') ? '' : process.env.BASE_PATH || '/retrograde'
+			base: '' // Clean root path!
 		}
 	}
 };

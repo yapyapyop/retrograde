@@ -232,14 +232,12 @@
   }
 
   .hero-box {
-    background: #fbf7ef;
-    border: 1px solid #bfac99;
+    background: var(--bg-field);
+    border: 1px solid #b89a82;
     border-radius: 4px;
     padding: 1.1rem 2.25rem;
     text-align: center;
-    box-shadow: 
-      0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 1px 3px rgba(0, 0, 0, 0.06);
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -3,6 +3,7 @@
   import NumbersView from '$lib/components/NumbersView.svelte';
   import SettingsModal from '$lib/components/SettingsModal.svelte';
   import ChronicleView from '$lib/components/ChronicleView.svelte';
+  import Icon from '$lib/components/Icon.svelte';
   
 
   let currentView = $state<'today' | 'chronicle' | 'numbers'>('today');
@@ -11,8 +12,10 @@
 </script>
 
 <div class="app-container">
+  <!-- Contained Toolbar: Views on Left, Crest in Center, Settings on Right -->
   <header class="topbar">
     <div class="topbar-inner">
+      <!-- Left: The Three Core Views -->
       <nav class="topbar-nav left">
         <button 
           type="button" 
@@ -20,7 +23,8 @@
           class:active={currentView === 'today'}
           onclick={() => currentView = 'today'}
         >
-          Today
+          <Icon name="today" size={15} />
+          <span>Today</span>
         </button>
         <button 
           type="button" 
@@ -28,37 +32,46 @@
           class:active={currentView === 'chronicle'}
           onclick={() => currentView = 'chronicle'}
         >
-          Chronicle
+          <Icon name="chronicle" size={15} />
+          <span>Chronicle</span>
         </button>
-      </nav>
-
-      <div class="topbar-brand">
-        <span class="brand">RetroGrade</span>
-      </div>
-
-      <nav class="topbar-nav right">
         <button 
           type="button" 
           class="nav-tab" 
           class:active={currentView === 'numbers'}
           onclick={() => currentView = 'numbers'}
         >
-          Numbers
+          <Icon name="numbers" size={15} />
+          <span>Numbers</span>
         </button>
+      </nav>
+
+      <!-- Center: Brand Crest -->
+      <div class="topbar-brand">
+        <span class="brand">RetroGrade</span>
+      </div>
+
+      <!-- Right: Utility Only -->
+      <nav class="topbar-nav right">
         <button 
           type="button" 
           class="nav-tab" 
           onclick={() => isSettingsOpen = true}
         >
-          Settings
+          <Icon name="settings" size={15} />
+          <span>Settings</span>
         </button>
       </nav>
     </div>
   </header>
 
+  <!-- Main View Stage -->
   <main class="main-content">
     {#if currentView === 'today'}
-      <TodayView bind:this={todayViewRef} />
+      <TodayView 
+        bind:this={todayViewRef} 
+        onNavigateToChronicle={() => currentView = 'chronicle'} 
+      />
     {:else if currentView === 'chronicle'}
       <ChronicleView />
     {:else if currentView === 'numbers'}
@@ -120,14 +133,16 @@
     padding: 0 1.5rem;
   }
 
-  .brand {
+   .brand {
     color: var(--text-on-dark);
-    font-family: var(--font-slab);
-    font-size: 1.4rem;
-    font-weight: 400;
+    font-family: var(--font-brand);
+    font-size: 1.55rem;
+    font-weight: 400;            /* Classical Roman regular weight */
+    font-style: normal;
     line-height: 1;
-    letter-spacing: 0.02em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    letter-spacing: 0.01em;
+    /* Soft deboss shadow that makes it look stamped into the leather */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
     user-select: none;
   }
 
@@ -144,6 +159,7 @@
     padding: 0 0.15rem;
     display: flex;
     align-items: center;
+    gap: 0.45rem;
     transition: none;
   }
 
@@ -161,7 +177,7 @@
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: flex-start;     /* Prevents vertical center jitter */
+    align-items: flex-start;    /* Prevents vertical center jitter */
     padding: 3.5rem 1.5rem 5rem;
   }
 

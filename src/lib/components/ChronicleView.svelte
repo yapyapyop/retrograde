@@ -38,8 +38,8 @@
     const minR = Math.min(...ratings);
     const maxR = Math.max(...ratings);
 
-    let min = Math.max(1, Math.floor(minR - 0.4));
-    let max = Math.min(10, Math.ceil(maxR + 0.4));
+    let min = Math.max(1, Math.floor(minR - 0.2));
+    let max = Math.min(10, Math.ceil(maxR + 0.2));
 
     if (max - min < 2) {
       min = Math.max(1, min - 1);
@@ -178,6 +178,41 @@
       return { xPercent: Math.min(xPercent, 96), yPercent, align: 'right', arrowOffsetPercent: 80 };
     }
     return { xPercent, yPercent, align: 'center', arrowOffsetPercent: 50 };
+  });
+
+  // Lightweight parser for paragraphs and bullet points
+  type TextBlock =
+    | { type: 'paragraph'; text: string }
+    | { type: 'list'; items: string[] }
+    | { type: 'spacer' };
+
+  const parsedBlocks = $derived.by(() => {
+    if (!activeEntry?.note) return [];
+    
+    const blocks: TextBlock[] = [];
+    let currentList: string[] | null = null;
+    const lines = activeEntry.note.split('\n');
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        if (!currentList) {
+          currentList = [];
+          blocks.push({ type: 'list', items: currentList });
+        }
+        currentList.push(trimmed.substring(2));
+      } else {
+        currentList = null;
+        if (trimmed === '') {
+          // Explicit blank line preserved
+          blocks.push({ type: 'spacer' });
+        } else {
+          blocks.push({ type: 'paragraph', text: line });
+        }
+      }
+    }
+    return blocks;
   });
 </script>
 
@@ -391,8 +426,20 @@
         </header>
 
         <div class="record-body">
-          {#if activeEntry.note}
-            <p class="record-text">{activeEntry.note}</p>
+          {#if parsedBlocks.length > 0}
+            {#each parsedBlocks as block}
+              {#if block.type === 'list'}
+                <ul class="record-list">
+                  {#each block.items as item}
+                    <li>{item}</li>
+                  {/each}
+                </ul>
+              {:else if block.type === 'spacer'}
+                <div class="record-spacer"></div>
+              {:else}
+                <p class="record-text">{block.text}</p>
+              {/if}
+            {/each}
           {:else}
             <p class="record-empty">No note recorded for this day.</p>
           {/if}
@@ -511,11 +558,9 @@
     position: relative;
     width: 100%;
     background: var(--bg-field);
-    border: 1px solid #bfac99;
-    border-radius: 3px;
-    box-shadow: 
-      inset 0 1px 3px rgba(0, 0, 0, 0.05),
-      0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid #b89a82;
+    border-radius: 4px;
+    box-shadow: none;
     margin-bottom: 2rem;
   }
 
@@ -565,7 +610,7 @@
     fill: none;
     stroke: #b39f8a;
     stroke-width: 1.5;
-    opacity: 0.6;
+    opacity: 0; /* invisible for now because I don't like how it looks */
   }
 
   /* Interactive Points */
@@ -575,7 +620,7 @@
   }
 
   .point-dot {
-    pointer-events: none; /* Mouse interacts with the hitbox above it */
+    pointer-events: none; 
     fill: var(--accent);
     stroke: #FAF7F2;
     stroke-width: 1.5;
@@ -712,16 +757,41 @@
     align-items: baseline;
     justify-content: space-between;
     border-bottom: 1px solid #bfac99;
-    padding-bottom: 0.6rem;
-    margin-bottom: 0.85rem;
+    padding-bottom: 1rem;       /* More breathing room */
+    margin-bottom: 1.5rem;      /* ~24px gap to the text */
   }
 
-  .record-date {
-    font-family: var(--font-interface);
+  .record-text {
+    font-family: var(--font-memory);
+    font-size: 1.35rem;
+    color: #453831;
+    line-height: 1.55;
+    margin: 0;
+    white-space: pre-wrap;       /* Preserves indentation and single line-breaks */
+  }
+
+  .record-spacer {
+    height: 1.25rem;             /* Exact height of a blank line */
+  }
+
+  .record-list {
+    font-family: var(--font-memory);
+    font-size: 1.35rem;
+    color: #453831;
+    line-height: 1.55;
+    padding-left: 1.5rem;
+    margin: 0.4rem 0;
+  }
+
+  .record-list li {
+    margin-bottom: 0.4rem;
+  }
+
+  .record-empty {
+    font-family: var(--font-memory);
     font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
+    font-style: italic;
+    color: var(--text-muted);
   }
 
   .record-score {
